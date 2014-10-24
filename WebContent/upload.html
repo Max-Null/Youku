@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap-3.2.0.min.css">
+    <link rel="shortcut icon" href="./images/icon64.png">
+	<title>Upload Video</title>
+</head>
+<body>
+	<div class="container">
+		<div class="masterhead" style="text-align: center;">
+			<h3 id="video_title">Upload Video</h3>
+		</div>
+		<div class="jumbotron" style="padding-top: 30px; padding-bottom: 30px; margin-bottom: 20px;">
+            <div class="row">
+                <form class="form-horizontal" role="form" name="video-upload">
+	                <fieldset>
+	                	<div class="form-group">
+	                		<label class="col-lg-2 control-label" for="spanSWFUploadButton">选择文件：</label>
+							<div id="uploadControl" class="col-lg-4" style="padding-top: 7px;">
+
+							</div>
+	                	</div>
+	                	<div class="form-group">
+							<label class="col-lg-2 control-label" for="input_title">标题：</label>
+							<div class="col-lg-4">
+								<input type="text" id="input_title" class="form-control" name="title">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-lg-2 control-label" for="textarea">简介：</label>
+							<div class="col-lg-4">
+								<textarea id="textarea" rows="3" class="form-control" name="description"></textarea>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-lg-2 control-label" for="input_tags">标签：</label>
+							<div class="col-lg-4">
+								<input type="text" id="input_tags" class="form-control" name="tags" value="STPie">
+								<span class="help-inline"></span>
+							</div>
+						</div>
+						<div class="form-group" style="display: none;">
+							<label class="col-lg-2 control-label" for="category-node">类别：</label>
+							<div class="col-lg-4">
+								<select id="category-node" class="form-control" name="category" >
+									<option value="Original" selected>原创</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group" style="display: none;">
+							<label class="col-lg-2 control-label">版权所有</label>
+							<div class="col-lg-4">
+								<label class="radio inline">
+									<input type="radio" name="copyright_type" id="copyright_type2" value="original" checked="">原创</label>
+								<!-- <label class="radio inline"><input type="radio" name="copyright_type" id="copyright_type1" value="reproduced">转载</label> -->
+							</div>
+						</div>
+						<div class="form-group" style="display: none;">
+							<label class="col-lg-2 control-label">视频权限</label>
+							<div class="col-lg-4">
+								<label class="radio inline">
+									<input type="radio" name="public_type" id="public_type1" value="all" checked="">公开
+								</label>
+								<label class="radio inline">
+									<input type="radio" name="public_type" id="public_type2" value="friend">仅好友
+								</label>
+								<label class="radio inline">
+									<input type="radio" name="public_type" id="public_type3" value="password">输入密码观看 
+								</label>
+								<label class="radio inline" style="display:none" id="passwrod">
+									<input type="text" class="input "name="watch_password">
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-lg-4 col-lg-offset-2">
+								<button type="submit" class="btn btn-primary start" id="btn-upload-start">
+									<span class="glyphicon glyphicon-upload"></span> 开始上传
+								</button>
+							</div>
+						</div>
+                	</fieldset>
+	            </form>
+            </div>
+            <div class="row" >
+				<div class="col-lg-5 col-lg-offset-2" id="upload-status-wraper" ></div>
+				<div class="col-lg-5 col-lg-offset-2" id="complete"></div>
+			</div>
+			<div class="row">
+				<div class="well" style="margin: 0;">
+					<h3>说明</h3>
+					<ul>
+						<li>最大支持上传<strong>1 GB</strong> 视频文件</li>
+						<li>允许上传的视频格式为：wmv,avi,dat,asf,rm,rmvb,ram,mpg,mpeg,3gp,mov,mp4,m4v,dvix,dv,
+						mkv,flv,vob,ram,qt,divx,cpk,fli,flc,mod。
+						</br>不符合格式的视频将会被丢弃，请确保视频格式的正确性，避免上传失败。
+						</li>
+					</ul>
+			</div>
+		</div>
+	</div>
+	<footer class="footer" style="text-align: center;">
+        &copy;2014 <a href="https://huoqi.github.com">huoqi</a> Youku Video Tool
+    </footer>
+
+	<script type="text/javascript" src="./js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="./js/youku_upload.js"></script>
+	<script type="text/javascript">
+		var USE_STREAM_UPLOAD = true;
+		jQuery(document).ready(function($) {
+			var client_id = getQueryString()['client_id'];
+			var access_token = getQueryString()['access_token'];
+			if (client_id == undefined || access_token == undefined) {
+				alert('Cann\'t upload without client id or access token!\nPlease check and try again!');
+			};
+
+			var param = {
+				client_id: client_id,
+				access_token: access_token,
+				oauth_opentype:"iframe",
+				oauth_redirect_uri:"http://pcm-env.elasticbeanstalk.com/upload.html",
+				oauth_state: "state",
+				completeCallback: "uploadComplete"
+			};
+			youkuUploadInit(param);
+
+		});
+
+		function uploadComplete(data){
+			alert("videoid="+data.videoid+"; title="+data.title + '\nUpload Sucessfully!');
+			uploadagain();
+		}
+
+		function getQueryString() {
+   		    var result = {}, 
+	   		  	queryString = location.search.slice(1),
+	   		    re = /([^&=]+)=([^&]*)/g, m;
+   		    while (m = re.exec(queryString)) {
+   		    	result[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+   		    }
+   		    return result;
+    	}
+	</script>
+
+</body>
+</html>
